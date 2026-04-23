@@ -140,26 +140,42 @@ function App() {
     inputRef.current?.focus();
   };
 
-  const handleSearch = async (e) => {
-    e?.preventDefault();
-    if (!query.trim()) { setError('Please enter a search query.'); return; }
-    setIsLoading(true); setError(null); setResults([]); setHasSearched(true);
-    try {
-      const response = await fetch('http://127.0.0.1:5000/rankDocuments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-      if (!response.ok) throw new Error('Server error.');
-      const data = await response.json();
-      setResults(data.results || []);
-    } catch (err) {
-      setError('Unable to reach the crawler backend. Make sure the Flask server is running on port 5000.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const handleSearch = async (e) => {
+  e?.preventDefault();
 
+  if (!query.trim()) {
+    setError('Please enter a search query.');
+    return;
+  }
+
+  setIsLoading(true);
+  setError(null);
+  setResults([]);
+  setHasSearched(true);
+
+  try {
+    const response = await fetch('http://localhost:5000/rankDocuments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Server error');
+    }
+
+    setResults(data.results || []);
+  } catch (err) {
+    console.error(err);
+    setError(err.message || 'Backend connection failed. Make sure Flask server is running.');
+  } finally {
+    setIsLoading(false);
+  }
+};
   const handleKeyDown = (e) => { if (e.key === 'Enter') handleSearch(); };
 
   return (
