@@ -154,7 +154,7 @@ const handleSearch = async (e) => {
   setHasSearched(true);
 
   try {
-    const response = await fetch('http://localhost:5000/rankDocuments', {
+    const response = await fetch('https://sci-tech-crawler-backend.onrender.com/rankDocuments', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
